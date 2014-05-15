@@ -3,6 +3,7 @@ package com.example.app;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
 import android.support.v4.app.FragmentActivity;
@@ -49,7 +50,6 @@ import java.util.List;
 
 public class ChatActivity extends ActionBarActivity {
     public static final List<Message> msgs = new ArrayList<Message>();
-    public static List<String> lines;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,7 +61,6 @@ public class ChatActivity extends ActionBarActivity {
                     .add(R.id.container, new ComposeFragment())
                             .commit();
         }
-        lines = Arrays.asList(getResources().getStringArray(R.array.dummy_convo));
     }
 
 
@@ -92,8 +91,6 @@ public class ChatActivity extends ActionBarActivity {
 
     public void receive_msg(View view){
         final android.os.Handler handler = view.getHandler();
-
-
         Runnable runner = new Runnable() {
             @Override
             public void run() {
@@ -116,30 +113,9 @@ public class ChatActivity extends ActionBarActivity {
                         JSONObject jobj = new JSONObject(sb.toString());
                         JSONObject jdata = jobj.getJSONObject("responseData");
                         JSONArray entries = jdata.getJSONArray("entries");
-                        for(int e = 0; e < entries.length(); e++){
-                        JSONObject entry = entries.getJSONObject(e);
-                        msgs.add(new Message(
-                                entry.getString("src"),
-                                entry.getString("dest"),
-                                entry.getString("text"),
-                                entry.getString("submit_time"),
-                                "forward"));
+                        for (int e=0; e<entries.length(); e++) {
+                            JSONObject entry = entries.getJSONObject(e);
                         }
-                        handler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                setContentView(R.layout.fragment_chat);
-                                /*
-                                LinearLayout ll = (LinearLayout)findViewById(R.id.messages_layout);
-                                for (int i=0; i<msgs.size(); i++) {
-                                    TextView tv = new TextView(getApplicationContext());
-                                    tv.setText(msgs.get(i).content);
-                                    ll.addView(tv);
-                                }
-                                */
-                            }
-                        });
-
                     } else {
                         //Closes the connection.
                         response.getEntity().getContent().close();
@@ -160,6 +136,7 @@ public class ChatActivity extends ActionBarActivity {
         Toast.makeText(getApplicationContext(), "Message sending...", Toast.LENGTH_SHORT).show();
         EditText et = (EditText)findViewById(R.id.compose_reply);
         final String temp = et.getText().toString();
+        et.setText("");
 
         Runnable runner = new Runnable() {
             @Override
@@ -214,7 +191,7 @@ public class ChatActivity extends ActionBarActivity {
         }
     }
 
-    public static ArrayAdapter<String> adapter;
+
     /**
      * A placeholder fragment containing the chat bubbles list
      */
@@ -242,32 +219,82 @@ public class ChatActivity extends ActionBarActivity {
 
         @Override
         public void onViewCreated(View view, Bundle savedInstanceState){
-            //final ArrayList<Message> msgs = new ArrayList<Message>();
+            final android.os.Handler handler = view.getHandler();
+            Runnable runner = new Runnable() {
+                @Override
+                public void run() {
+                    String url = "http://chattr.site11.com/receive_msg.php";
+
+                    try {
+                        HttpClient httpclient = new DefaultHttpClient();
+                        HttpResponse response = httpclient.execute(new HttpGet(url));
+                        StatusLine statusLine = response.getStatusLine();
+                        if (statusLine.getStatusCode() == HttpStatus.SC_OK) {
+                            BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent(), "UTF-8"), 8);
+                            StringBuilder sb = new StringBuilder();
+
+                            String line = null;
+                            while ((line = reader.readLine()) != null)
+                            {
+                                sb.append(line + "\n");
+                            }
+
+                            JSONObject jobj = new JSONObject(sb.toString());
+                            JSONObject jdata = jobj.getJSONObject("responseData");
+                            JSONArray entries = jdata.getJSONArray("entries");
+                            for(int e = 0; e < entries.length(); e++){
+                                JSONObject entry = entries.getJSONObject(e);
+                                msgs.add(new Message(
+                                        entry.getString("src"),
+                                        entry.getString("dest"),
+                                        entry.getString("text"),
+                                        entry.getString("submit_time"),
+                                        "forward"));
+                            }
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    //setContentView(R.layout.fragment_chat);
+                                    ArrayList<String> messages = new ArrayList<String>();
+                                    for(int i = 0; i < messages.size(); i++){
+                                        messages.add(msgs.get(i).content);
+                                    }
+
+                                    //setListAdapter(new ArrayAdapter<String>(getActivity(), R.layout.conversation_layout, messages));
+
+                                }
+                            });
+
+                        } else {
+                            //Closes the connection.
+                            response.getEntity().getContent().close();
+                        }
+                    }
+                    catch (Exception ex) {
+                        String str = ex.getMessage();
+                    }
+                }
+            };
+            new Thread(runner).start();
+
+
             List<String> text = new ArrayList<String>();
             for(int i = 0; i < msgs.size(); i++){
                 text.add(msgs.get(i).content);
             }
 
-            adapter = new ArrayAdapter<String>(this.getActivity(), R.layout.chat_layout, text);
-            setListAdapter(adapter);
+            Resources res = getResources();
+            String[] conversation = res.getStringArray(R.array.dummy_convo);
+            setListAdapter(new ArrayAdapter<String>(this.getActivity(), R.layout.chat_layout, conversation));
             ListView lv = getListView();
+            lv.setTextFilterEnabled(true);
 
             // top margin = 150 is a large enough distance to prevent the two fragments from overlapping
-            // it looks fine on the tablet, but it may not on a phone or other device
-            /* HACK-Y FIX */
             setMargins(view, 0, 140, 0, 0);
 
             // This gets rid of the listview dividers between each item
             lv.setDivider(null);
 
-
-            // TODO:
-            // Make the listview items unclickable
-            // Include MSG class
-            // Change chat bubble image according to sender
-            // Change text-justification according to sender
-            // Fix send_message function
-            // Fix contacts tab to show contacts_layout
         }
     }
 

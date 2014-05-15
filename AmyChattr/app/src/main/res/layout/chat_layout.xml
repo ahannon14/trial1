@@ -4,7 +4,7 @@
     android:id="@+id/chat_box"
     android:text="@string/hello_world"
     android:textSize="30sp"
-    android:gravity="center_vertical|right"
-    android:background="@drawable/chat_bubble_right_9patch"
-    android:layout_width="match_parent"
+    android:gravity="center_vertical|left"
+    android:background="@drawable/chat_bubble_left_9patch"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content" />

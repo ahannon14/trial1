@@ -3,6 +3,7 @@ package com.example.app;
 import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -17,7 +18,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.os.Build;
 import android.os.Handler;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -48,15 +51,14 @@ import java.util.List;
 public class LoginActivity extends ActionBarActivity {
 
     private static int SPLASH_TIME_OUT = 500;
-    public static String msg_Url = "http://127.0.0.1:8000/chat/msg/";
-    public static String reg_Url = "http://127.0.0.1:8000/chat/register/";
-    public static String recv_Url = "http://127.0.0.1:8000/chat/receive/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // If the user exists
-        if(true){
+
+        if(if_user_exists()){
+            setContentView(R.layout.fragment_login);
            // Toast.makeText(this, "user exists", Toast.LENGTH_SHORT).show();
             new Handler().postDelayed(new Runnable() {
                 /*
@@ -79,6 +81,9 @@ public class LoginActivity extends ActionBarActivity {
         //when no user exists, login and register
         else{
             setContentView(R.layout.activity_login);
+            EditText et = (EditText) findViewById(R.id.zone);
+            et.setFocusableInTouchMode(true);
+            et.requestFocus();
             setLogin(savedInstanceState);
         }
     }
@@ -119,11 +124,13 @@ public class LoginActivity extends ActionBarActivity {
         }
     }
 
-    public boolean if_user_exist(){
+    volatile Boolean user_exists = false;
+
+    public boolean if_user_exists(){
         Runnable runner = new Runnable() {
             @Override
             public void run() {
-                String url = String.format("http://chattr.site11.com/send_msg.php?src=%s&dest=%s&text=%s", "111", "222", "blah");
+                String url = "http://chattr.site11.com/receive_users.php";
 
                 try {
                     HttpClient httpclient = new DefaultHttpClient();
@@ -139,15 +146,20 @@ public class LoginActivity extends ActionBarActivity {
                         {
                             sb.append(line + "\n");
                         }
-
+                        ArrayList<User> users = new ArrayList<User>();
                         JSONObject jobj = new JSONObject(sb.toString());
                         JSONObject jdata = jobj.getJSONObject("responseData");
                         JSONArray entries = jdata.getJSONArray("entries");
-                        if(entries.length() != 0){
-                            // user found!
-                        }
-                        else{
-                            // user not found
+                        for(int i = 0; i < entries.length(); i++){
+                            JSONObject entry = entries.getJSONObject(i);
+                            if(entry.getString("name").equals("valentine smith")){
+                                // user exists!
+                                user_exists = true;
+                            }
+                            else {
+                                // user doesn't exist
+                                user_exists = false;
+                            }
                         }
 
                     } else {
@@ -163,7 +175,7 @@ public class LoginActivity extends ActionBarActivity {
         };
         new Thread(runner).start();
 
-        return true;
+        return user_exists;
 
     }
 
@@ -173,6 +185,7 @@ public class LoginActivity extends ActionBarActivity {
             @SuppressLint("NewApi")
             @Override
             public void onClick(View v) {
+
                 //get the zone content from zone
                 TextView zoneContentView = (TextView)findViewById(R.id.zone);
                 String zone = zoneContentView.getText().toString();
@@ -244,47 +257,4 @@ public class LoginActivity extends ActionBarActivity {
 
         });
     }
-    public void sendUser(final String name,final String number){//send the name and number to server
-        HttpClient httpclient = new DefaultHttpClient();
-        HttpPost httppost = new HttpPost(LoginActivity.reg_Url);
-        String strResult = "";
-        try {
-            // Add your data
-            List<NameValuePair> msgValuePairs = new ArrayList<NameValuePair>(2);
-            msgValuePairs.add(new BasicNameValuePair("name", name));
-            msgValuePairs.add(new BasicNameValuePair("number", number));
-            httppost.setEntity(new UrlEncodedFormEntity(msgValuePairs));
-
-            // Execute HTTP Post Request
-            HttpResponse response = httpclient.execute(httppost);
-            strResult = EntityUtils.toString(response.getEntity());
-            Toast.makeText(LoginActivity.this, "received: "+strResult, Toast.LENGTH_SHORT).show();
-        } catch (ClientProtocolException e) {
-            Toast.makeText(LoginActivity.this, "failed "+e.toString(), Toast.LENGTH_SHORT).show();
-        } catch (IOException e) {
-            Toast.makeText(LoginActivity.this, "failed "+e.toString(), Toast.LENGTH_SHORT).show();
-        }
-    }
-    public void saveUser(final String name, final String zone, final String subnum,final String num){
-        ContentResolver contentResolver = null;
-        contentResolver = getContentResolver();
-        ContentValues values = new ContentValues();
-        values.put(USERS.USER._NUM,num);
-        values.put(USERS.USER._ZONE,zone);
-        values.put(USERS.USER._SUBNUM,subnum);
-        values.put(USERS.USER._NAME,name);
-        values.put(USERS.USER._FLAG,"1");
-        //here goes the insert method;
-        try{
-            Uri userUri = contentResolver.insert(USERS.USER.USERS_CONTENT_URI, values);
-            Toast.makeText(LoginActivity.this,"user saved:"+ userUri,Toast.LENGTH_LONG).show();
-        }
-        catch (Exception e)
-        {
-            Toast.makeText(LoginActivity.this,"user save faild:"+e.toString(),Toast.LENGTH_LONG).show();
-        }
-        //print a notification
-
-    }
-
 }

@@ -1,0 +1,29 @@
+<!-- From: file:/Z:/CS396/Final/AmyChattr/app/src/main/AndroidManifest.xml --><manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="1" android:versionName="1.0" package="com.example.app">
+    <uses-sdk android:minSdkVersion="7" android:targetSdkVersion="19"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+
+    <application android:allowBackup="true" android:icon="@drawable/chattr_icon_large" android:label="@string/app_name" android:theme="@style/AppTheme">
+
+        <activity android:configChanges="orientation|keyboardHidden|screenSize" android:label="@string/app_name" android:name="com.example.app.MainActivity">
+        </activity>
+
+        <activity android:label="@string/title_activity_login" android:name="com.example.app.LoginActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+
+        <activity android:label="@string/title_activity_chat" android:name="com.example.app.ChatActivity" android:parentActivityName="com.example.app.MainActivity">
+            <meta-data android:name="android.support.PARENT_ACTIVITY" android:value="MainActivity"/>
+
+        </activity>
+
+        <activity android:label="@string/title_activity_contact" android:name="com.example.app.ContactActivity" android:parentActivityName="com.example.app.MainActivity">
+            <meta-data android:name="android.support.PARENT_ACTIVITY" android:value="MainActivity"/>
+        </activity>
+
+    </application>
+
+</manifest>

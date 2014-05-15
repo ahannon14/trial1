@@ -1,0 +1,32 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:padding="6dip" >
+
+    <ImageView
+        android:id="@+id/contact_image"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginRight="6dip"
+        android:src="@drawable/stock_photo" />
+
+    <TextView
+        android:id="@+id/phone_number"
+        android:text="Description!"
+        android:layout_width="fill_parent"
+        android:layout_height="50dip"
+        android:layout_below="@+id/contact_name"
+        android:layout_toRightOf="@id/contact_image"
+        android:textSize="30sp" />
+
+    <TextView
+        android:id="@+id/contact_name"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/contact_image"
+        android:gravity="center_vertical"
+        android:text="Example application"
+        android:textSize="50sp" />
+
+</RelativeLayout> <!-- From: file:/Z:/CS396/Final/AmyChattr/app/src/main/res/layout/contacts_layout.xml -->

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/chat_box"
+    android:text="@string/hello_world"
+    android:textSize="30sp"
+    android:gravity="center_vertical|left"
+    android:background="@drawable/chat_bubble_left_9patch"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" /><!-- From: file:/Z:/CS396/Final/AmyChattr/app/src/main/res/layout/chat_layout.xml -->

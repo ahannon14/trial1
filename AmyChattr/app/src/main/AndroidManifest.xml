@@ -5,7 +5,7 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@drawable/chattr_icon_large"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
 
@@ -45,16 +45,6 @@
                 android:value="MainActivity" />
         </activity>
 
-        <receiver android:name=".ReceiverSMS" android:enabled="true">
-            <intent-filter>
-                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
-            </intent-filter>
-        </receiver>
-
-        <service android:name="com.example.app.MyService" />
-        <provider
-            android:authorities="com.example.app.chattr"
-            android:name=".MSGProvider"/>
     </application>
 
 </manifest>

@@ -21,6 +21,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
 import android.support.v7.app.ActionBarActivity;
@@ -37,6 +38,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -57,6 +60,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -84,6 +88,9 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Hide the keyboard-- for some reason, my project made this pop up after login
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
         // Set up the action bar.
         final ActionBar actionBar = getSupportActionBar();
@@ -118,17 +125,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                             .setText(mSectionsPagerAdapter.getPageTitle(i))
                             .setTabListener(this));
         }
-        //start a service, listen from server.
-        startService(new Intent(this, MyService.class));
-        start_recv_service();
-    }
-    public void start_recv_service()
-    {
-        AlarmManager aManager = (AlarmManager) getSystemService(Service.ALARM_SERVICE);
-        Intent intent = new Intent(MainActivity.this,MyService.class);
-        final PendingIntent pi = PendingIntent.getService(MainActivity.this, 0, intent, 0);
-        aManager.setRepeating(AlarmManager.RTC_WAKEUP, 0, 15000, pi);
-        //Toast.makeText(CallAndSms.this, "start service to recv unread", Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -336,18 +332,64 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         public void onViewCreated(View view, Bundle savedInstanceState){
             int section = getArguments().getInt(ARG_SECTION_NUMBER);
 
-            List<String> lines = new ArrayList<String>();
-            switch(section){
-                case 1: lines = Arrays.asList(getResources().getStringArray(R.array.conversation_list));
-                    setListAdapter(new ArrayAdapter<String>(this.getActivity(), R.layout.conversation_layout, lines));
-                    break;
-                case 2:
-                    break;
-                case 3: lines = Arrays.asList(getResources().getStringArray(R.array.contacts_list));
-                    // NOTE:  Eventually the contacts list should show:  an image, a name, and a number
-                    setListAdapter(new ArrayAdapter<String>(this.getActivity(), R.layout.conversation_layout, lines));
-                    break;
-            }
+            final android.os.Handler handler = view.getHandler();
+            Runnable runner = new Runnable() {
+                @Override
+                public void run() {
+                    String url = "http://chattr.site11.com/receive_users.php";
+
+                    try {
+                        HttpClient httpclient = new DefaultHttpClient();
+                        HttpResponse response = httpclient.execute(new HttpGet(url));
+                        StatusLine statusLine = response.getStatusLine();
+                        if (statusLine.getStatusCode() == HttpStatus.SC_OK) {
+                            BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent(), "UTF-8"), 8);
+                            StringBuilder sb = new StringBuilder();
+
+                            String line = null;
+                            while ((line = reader.readLine()) != null)
+                            {
+                                sb.append(line + "\n");
+                            }
+                            final ArrayList<User> users = new ArrayList<User>();
+                            JSONObject jobj = new JSONObject(sb.toString());
+                            JSONObject jdata = jobj.getJSONObject("responseData");
+                            JSONArray entries = jdata.getJSONArray("entries");
+                            for (int e=0; e<entries.length(); e++) {
+                                JSONObject entry = entries.getJSONObject(e);
+                                users.add(new User(
+                                        entry.getString("name"),
+                                        entry.getString("number")));
+                            }
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    ArrayList<String> names = new ArrayList<String>();
+                                    for(int i = 0; i < users.size(); i++){
+                                        names.add(users.get(i).name);
+                                    }
+                                    setListAdapter(new ArrayAdapter<String>(getActivity(), R.layout.conversation_layout, names));
+                                    /*
+                                    LinearLayout ll = (LinearLayout)findViewById(R.id.results);
+                                    for (int i=0; i<res.size(); i++) {
+                                        TextView tv = new TextView(getApplicationContext());
+                                        tv.setText(res.get(i));
+                                        ll.addView(tv);
+                                    }
+                                    */
+                                }
+                            });
+                        } else {
+                            //Closes the connection.
+                            response.getEntity().getContent().close();
+                        }
+                    }
+                    catch (Exception ex) {
+                        ;
+                    }
+                }
+            };
+            new Thread(runner).start();
 
             ListView lv = getListView();
             lv.setTextFilterEnabled(true);

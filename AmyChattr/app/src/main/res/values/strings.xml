@@ -25,14 +25,13 @@
         <item>            Beck Taylor</item>
     </string-array>
     <string-array name="dummy_convo">
-        <item>"Hey!  What's up?"</item>
-        <item>Yo.  Nothing much.</item>
-        <item>Did you get the answer to #2?</item>
-        <item>Nope.  Gave up.</item>
-        <item>">:( You were my last hope!"</item>
+        <item>"Chat bubble!"</item>
+        <item>"It can stretch horizontally!"</item>
+        <item>"It can stretch vertically, too, without contorting the bubble!  Neat, huh?  I can put all kinds of text in here!  Blah blah blah! CS is cool.  Android is hard.  S'go Bucs!"</item>
+        <item>"This chat bubble created with the help of 9patch"</item>
     </string-array>
 
-    <string name="title_activity_login">LoginActivity</string>
+    <string name="title_activity_login">Chattr</string>
     <string name="hello_world">Hello world!</string>
     <string name="splash_desc">Splash page image</string>
 
