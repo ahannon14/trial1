@@ -932,7 +932,6 @@ containing a value of this type.
         public static final int progress_circular=0x7f080018;
         public static final int progress_horizontal=0x7f080019;
         public static final int radio=0x7f08002f;
-        public static final int refresh=0x7f080056;
         public static final int reply_btn=0x7f08004e;
         public static final int search_badge=0x7f080032;
         public static final int search_bar=0x7f080031;
@@ -1001,9 +1000,8 @@ containing a value of this type.
         public static final int fragment_contact=0x7f030022;
         public static final int fragment_login=0x7f030023;
         public static final int fragment_main=0x7f030024;
-        public static final int list_item=0x7f030025;
-        public static final int list_layout=0x7f030026;
-        public static final int support_simple_spinner_dropdown_item=0x7f030027;
+        public static final int list_layout=0x7f030025;
+        public static final int support_simple_spinner_dropdown_item=0x7f030026;
     }
     public static final class menu {
         public static final int chat=0x7f0d0000;

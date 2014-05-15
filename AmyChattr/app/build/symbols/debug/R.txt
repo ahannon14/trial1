@@ -303,7 +303,6 @@ int id phone_number 0x7f080050
 int id progress_circular 0x7f080018
 int id progress_horizontal 0x7f080019
 int id radio 0x7f08002f
-int id refresh 0x7f080056
 int id reply_btn 0x7f08004e
 int id search_badge 0x7f080032
 int id search_bar 0x7f080031
@@ -368,9 +367,8 @@ int layout fragment_chat 0x7f030021
 int layout fragment_contact 0x7f030022
 int layout fragment_login 0x7f030023
 int layout fragment_main 0x7f030024
-int layout list_item 0x7f030025
-int layout list_layout 0x7f030026
-int layout support_simple_spinner_dropdown_item 0x7f030027
+int layout list_layout 0x7f030025
+int layout support_simple_spinner_dropdown_item 0x7f030026
 int menu chat 0x7f0d0000
 int menu contact 0x7f0d0001
 int menu login 0x7f0d0002

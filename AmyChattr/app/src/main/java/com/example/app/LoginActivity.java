@@ -47,7 +47,9 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+ * This activity lets a new user login and an old user get the splash page
+ */
 public class LoginActivity extends ActionBarActivity {
 
     private static int SPLASH_TIME_OUT = 500;
@@ -55,11 +57,10 @@ public class LoginActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // If the user exists
 
+        // Check if the user exists
         if(if_user_exists()){
             setContentView(R.layout.fragment_login);
-           // Toast.makeText(this, "user exists", Toast.LENGTH_SHORT).show();
             new Handler().postDelayed(new Runnable() {
                 /*
                  * Showing splash screen with a timer. This will be useful when you
@@ -109,7 +110,7 @@ public class LoginActivity extends ActionBarActivity {
     }
 
     /**
-     * A placeholder fragment containing a simple view.
+     * A placeholder fragment defining the login activity
      */
     public static class PlaceholderFragment extends Fragment {
 
@@ -126,6 +127,7 @@ public class LoginActivity extends ActionBarActivity {
 
     volatile Boolean user_exists = false;
 
+    // This function checks whether the user exists.  Currently it always returns false.
     public boolean if_user_exists(){
         Runnable runner = new Runnable() {
             @Override
@@ -169,7 +171,6 @@ public class LoginActivity extends ActionBarActivity {
                 }
                 catch (Exception ex) {
                     String str = ex.getMessage();
-                    //Toast.makeText(getApplicationContext(), ex.getMessage(), Toast.LENGTH_SHORT);
                 }
             }
         };
@@ -179,6 +180,10 @@ public class LoginActivity extends ActionBarActivity {
 
     }
 
+    /**
+     * Saves the user and sends a POST request to the database with new user information
+     * @param savedInstanceState
+     */
     public void setLogin(final Bundle savedInstanceState){
         Button login = (Button) findViewById(R.id.login);
         login.setOnClickListener(new View.OnClickListener(){
@@ -197,15 +202,13 @@ public class LoginActivity extends ActionBarActivity {
                 final String name = nameContentView.getText().toString();
                 final String number = zone.concat(subnum);//generate a full number like +8615527518807
                 if(!(zone.startsWith("+"))||number.equals("")||name.equals("")){//input error
-                    Toast.makeText(v.getContext(), "Invalidate Input String", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(v.getContext(), "Invalid Input String", Toast.LENGTH_SHORT).show();
                 }
                 else{
-                    //final android.os.Handler handler = v.getHandler();
                     Runnable runner = new Runnable() {
                         @Override
                         public void run() {
                             String url = String.format("http://chattr.site11.com/insert_user.php?name=%s&number=%s", name, number);
-                            //String url = String.format("https://ajax.googleapis.com/ajax/services/feed/find?v=1.0&q=%s", search);
 
                             try {
                                 HttpClient httpclient = new DefaultHttpClient();
@@ -234,8 +237,6 @@ public class LoginActivity extends ActionBarActivity {
                     new Thread(runner).start();
                 }
 
-                //sendUser(name,number);
-                //saveUser(name,zone,subnum,number);
                 //Switch Activity after user registered and saved
                 new Handler().postDelayed(new Runnable() {
                 /*

@@ -369,14 +369,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                                         names.add(users.get(i).name);
                                     }
                                     setListAdapter(new ArrayAdapter<String>(getActivity(), R.layout.conversation_layout, names));
-                                    /*
-                                    LinearLayout ll = (LinearLayout)findViewById(R.id.results);
-                                    for (int i=0; i<res.size(); i++) {
-                                        TextView tv = new TextView(getApplicationContext());
-                                        tv.setText(res.get(i));
-                                        ll.addView(tv);
-                                    }
-                                    */
                                 }
                             });
                         } else {
@@ -396,7 +388,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                    Toast.makeText(view.getContext(), ((TextView) view).getText(), Toast.LENGTH_SHORT).show();
                     // Start the activity, send data over
                     // If tabPosition = 0, then send it to chat activity
                     // If tabPosition = 2, then send it to the contact view activity (1 should never be hit)

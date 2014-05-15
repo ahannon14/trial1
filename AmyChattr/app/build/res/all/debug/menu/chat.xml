@@ -7,11 +7,5 @@
         android:title="@string/action_settings"
         android:orderInCategory="100"
         app:showAsAction="never" />
-
-    <item android:id="@+id/refresh"
-        android:title="@string/refresh_option"
-        android:icon="@drawable/ic_menu_refresh"
-        android:orderInCategory="100"
-        app:showAsAction="always" />
 </menu>
 <!-- From: file:/Z:/CS396/Final/AmyChattr/app/src/main/res/menu/chat.xml -->

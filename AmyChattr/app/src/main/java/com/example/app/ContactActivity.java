@@ -13,6 +13,9 @@ import android.view.ViewGroup;
 import android.os.Build;
 import android.widget.TextView;
 
+/**
+ * This activity displays contact information.  Currently unfinished.
+ */
 public class ContactActivity extends ActionBarActivity {
 
     @Override
@@ -49,7 +52,7 @@ public class ContactActivity extends ActionBarActivity {
     }
 
     /**
-     * A placeholder fragment containing a simple view.
+     * A placeholder fragment containing the contacts view
      */
     public static class PlaceholderFragment extends Fragment {
 
@@ -61,20 +64,24 @@ public class ContactActivity extends ActionBarActivity {
                 Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_contact, container, false);
 
-            // fragment_contact
+            // Set the view to the contacts_layout
             this.getActivity().setContentView(R.layout.contacts_layout);
             Intent i = this.getActivity().getIntent();
 
+            // Get the extra data from the intent
             int itemNumber = i.getIntExtra("contact item number",0);
-
-            //TextView tv = (TextView)getActivity().findViewById(R.id.contact);
-            //String[] c = getResources().getStringArray(R.array.contacts_list);
-            //tv.setText(String.format("Contact: %s", c[itemNumber]));
-
 
             TextView tv1 = (TextView)getActivity().findViewById(R.id.contact_name);
             String[] c1 = getResources().getStringArray(R.array.contacts_list);
-            tv1.setText(String.format("Contact: %s", c1[itemNumber]));
+
+            // Use the dummy contact information where you can
+            if(itemNumber < c1.length){
+                tv1.setText(String.format("Contact: %s", c1[itemNumber]));
+            }
+            // Otherwise, set error message
+            else{
+                tv1.setText("Contact: Not found");
+            }
 
             return rootView;
         }

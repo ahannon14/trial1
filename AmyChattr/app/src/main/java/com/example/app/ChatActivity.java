@@ -48,6 +48,10 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * Chat Activity is the view that contains a fragment for composing a reply message, and
+ * a fragment for displaying messages.
+ */
 public class ChatActivity extends ActionBarActivity {
     public static final List<Message> msgs = new ArrayList<Message>();
     @Override
@@ -82,58 +86,13 @@ public class ChatActivity extends ActionBarActivity {
         if (id == R.id.action_settings) {
             return true;
         }
-        if(id == R.id.refresh){
-            receive_msg(findViewById(R.id.refresh));
-            return true;
-        }
         return super.onOptionsItemSelected(item);
     }
 
-    public void receive_msg(View view){
-        final android.os.Handler handler = view.getHandler();
-        Runnable runner = new Runnable() {
-            @Override
-            public void run() {
-                String url = "http://chattr.site11.com/receive_msg.php";
-
-                try {
-                    HttpClient httpclient = new DefaultHttpClient();
-                    HttpResponse response = httpclient.execute(new HttpGet(url));
-                    StatusLine statusLine = response.getStatusLine();
-                    if (statusLine.getStatusCode() == HttpStatus.SC_OK) {
-                        BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent(), "UTF-8"), 8);
-                        StringBuilder sb = new StringBuilder();
-
-                        String line = null;
-                        while ((line = reader.readLine()) != null)
-                        {
-                            sb.append(line + "\n");
-                        }
-
-                        JSONObject jobj = new JSONObject(sb.toString());
-                        JSONObject jdata = jobj.getJSONObject("responseData");
-                        JSONArray entries = jdata.getJSONArray("entries");
-                        for (int e=0; e<entries.length(); e++) {
-                            JSONObject entry = entries.getJSONObject(e);
-                        }
-                    } else {
-                        //Closes the connection.
-                        response.getEntity().getContent().close();
-                    }
-                }
-                catch (Exception ex) {
-                    String str = ex.getMessage();
-                }
-            }
-        };
-        new Thread(runner).start();
-    }
     /**
      * This function will send the message to the database
-     * (or the string-array, for now)
      */
     public void send_message(View view) {
-        Toast.makeText(getApplicationContext(), "Message sending...", Toast.LENGTH_SHORT).show();
         EditText et = (EditText)findViewById(R.id.compose_reply);
         final String temp = et.getText().toString();
         et.setText("");
@@ -141,6 +100,8 @@ public class ChatActivity extends ActionBarActivity {
         Runnable runner = new Runnable() {
             @Override
             public void run() {
+                // Sends the message (typed in the edittext) to the database
+                // Uses hard-coded values 111 and 222 for the source and destination, respectively
                 String url = String.format("http://chattr.site11.com/send_msg.php?src=%s&dest=%s&text=%s", "111", "222", temp);
 
                 try {
@@ -155,13 +116,6 @@ public class ChatActivity extends ActionBarActivity {
                         while ((line = reader.readLine()) != null)
                         {
                             sb.append(line + "\n");
-                        }
-
-                        JSONObject jobj = new JSONObject(sb.toString());
-                        JSONObject jdata = jobj.getJSONObject("responseData");
-                        JSONArray entries = jdata.getJSONArray("entries");
-                        for (int e=0; e<entries.length(); e++) {
-                            JSONObject entry = entries.getJSONObject(e);
                         }
                     } else {
                         //Closes the connection.
@@ -202,7 +156,7 @@ public class ChatActivity extends ActionBarActivity {
 
         /**
          * This function sets the margins for the listview fragment
-         * I call it in onViewCreated because the listview was being a little brat
+         * I call it in onViewCreated because the listview was being a punk
          * @param v
          * @param l
          * @param t
@@ -219,6 +173,10 @@ public class ChatActivity extends ActionBarActivity {
 
         @Override
         public void onViewCreated(View view, Bundle savedInstanceState){
+
+            // This runner is meant to retrieve all new messages for the conversation.
+            // However, it's not working correctly.  I commented out the setListAdapter
+            // in order to see some dummy data.
             final android.os.Handler handler = view.getHandler();
             Runnable runner = new Runnable() {
                 @Override
@@ -260,6 +218,8 @@ public class ChatActivity extends ActionBarActivity {
                                         messages.add(msgs.get(i).content);
                                     }
 
+                                    // setListAdapter is supposed to put the messages into the listview
+                                    // Currently it shows the loading wheel indefinitely
                                     //setListAdapter(new ArrayAdapter<String>(getActivity(), R.layout.conversation_layout, messages));
 
                                 }
@@ -277,14 +237,10 @@ public class ChatActivity extends ActionBarActivity {
             };
             new Thread(runner).start();
 
-
-            List<String> text = new ArrayList<String>();
-            for(int i = 0; i < msgs.size(); i++){
-                text.add(msgs.get(i).content);
-            }
-
+            // Grab the resources from strings.xml
             Resources res = getResources();
             String[] conversation = res.getStringArray(R.array.dummy_convo);
+            // Set the list with the string array and the chat layout .xml
             setListAdapter(new ArrayAdapter<String>(this.getActivity(), R.layout.chat_layout, conversation));
             ListView lv = getListView();
             lv.setTextFilterEnabled(true);
